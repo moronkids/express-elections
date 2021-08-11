@@ -1,12 +1,20 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const calonSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "name cannot empty"],
+    required: [true, 'name cannot empty'],
+  },
+  gender: {
+    type: String,
+    required: [true, 'gender cannot empty'],
+  },
+  age: {
+    type: Number,
+
   },
 });
-const Calon = mongoose.model("Calon", calonSchema);
+const Calon = mongoose.model('Calon', calonSchema);
 // const testCalon = new Calon({
 //   name: "Adit Ardhan",
 // });

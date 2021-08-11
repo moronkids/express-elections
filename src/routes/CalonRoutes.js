@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   getList,
   getListDetail,
-  checkID,
   createList,
   updateCalon,
   deleteCalon,
