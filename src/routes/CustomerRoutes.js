@@ -3,12 +3,13 @@ const express = require('express');
 const router = express.Router();
 const {
   createList,
+  getCustomer,
 } = require('../controllers/CostumerController'); // imp controller by destructuring
 
 // router.param("id", checkID);
 router
   .route('/')
-//   .get(getList)
+  .get(getCustomer)
   .post(createList); // detail vesion
 
 // router
