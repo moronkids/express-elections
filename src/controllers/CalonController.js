@@ -22,17 +22,40 @@ exports.getList = async (req, res) => {
   try {
     // 1. Filtering
     const queryObj = { ...req.query };
-    const excludedField = []; // when u want to secure ur db
+    const excludedField = ['sort', 'fields']; // when u want to secure ur db
     excludedField.forEach((el) => delete queryObj[el]);
-    // 2. Adv Filtering greater than.. etc
+    // 1.1 Adv Filtering greater than.. etc
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    const AllData = await Calon.find(JSON.parse(queryStr));
+    console.log(JSON.parse(queryStr), 'heh');
+
+    // 2. Sorting
+    let AllData = Calon.find(JSON.parse(queryStr));
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      console.log(sortBy, 'tes');
+      AllData = AllData.sort(sortBy);
+    } else {
+      AllData = AllData.sort('-name');
+    }
+
+    // 3 field limitiing
+    if (req.query.fields) {
+      const fields = await req.query.fields.split(',').join(' ');
+      AllData = AllData.select(fields);
+    } else {
+      AllData = AllData.select('-__v');
+    }
+
+    const qry = await AllData;
+    // const data = await Calon.find({}).select('gender');
+    // console.log('>>', qry, data);
     res.status(200).json({
       status: 'success',
-      data: AllData,
+      data: qry,
     });
   } catch (err) {
+    console.log(err, 'error');
     res
       .status(404) // http status
       .json({
