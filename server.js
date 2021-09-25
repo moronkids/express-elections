@@ -1,7 +1,13 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const express = require('express');
+const http = require('http');
+const socket = require('socket.io');
 const app = require('./app');
+
+const httpServer = http.createServer(app);
 
 app.use(express.json());
 // from app.js
@@ -22,6 +28,19 @@ mongoose
 
 const { env } = process;
 const port = env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`App running on port ${port} `);
+const ser = app.listen(port, () => {
+  console.log('running');
+});
+// const io = socket.listen(ser);
+const io = socket(ser, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', async (socket) => {
+  socket.on('imclient', (arg) => {
+    io.emit('imclient', 'peli');
+  });
 });

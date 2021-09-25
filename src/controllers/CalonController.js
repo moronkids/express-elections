@@ -22,7 +22,7 @@ exports.getList = async (req, res) => {
   try {
     // 1. Filtering
     const queryObj = { ...req.query };
-    const excludedField = ['sort', 'fields']; // when u want to secure ur db
+    const excludedField = ['sort', 'fields', 'page', 'limit']; // when u want to secure ur db
     excludedField.forEach((el) => delete queryObj[el]);
     // 1.1 Adv Filtering greater than.. etc
     let queryStr = JSON.stringify(queryObj);
@@ -46,21 +46,32 @@ exports.getList = async (req, res) => {
     } else {
       AllData = AllData.select('-__v');
     }
+    // 4 pagination
+    // page2&limit=10, 1-10, page 1, 11-20
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    // const limit = 1;
+    const skip = await (page - 1) * limit;
+    console.log(Number.isInteger(page), Number.isInteger(limit));
+    AllData = AllData.limit(limit).skip(skip);
 
+    if (req.query.page) {
+      const numCust = await Calon.countDocuments();
+      if (skip >= numCust) throw new Error('this page does`nt exist');
+    }
+    // execute query
     const qry = await AllData;
-    // const data = await Calon.find({}).select('gender');
-    // console.log('>>', qry, data);
     res.status(200).json({
       status: 'success',
       data: qry,
     });
   } catch (err) {
-    console.log(err, 'error');
+    console.log(err.message, 'error');
     res
       .status(404) // http status
       .json({
         status: 'failed',
-        message: err,
+        message: err.message,
         data: {},
       });
   }
