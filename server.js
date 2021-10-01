@@ -32,6 +32,7 @@ const port = env.PORT || 5000;
 const ser = app.listen(port, () => {
   console.log("running");
 });
+// testing untuk force push
 // const io = socket.listen(ser);
 const io = socket(ser, {
   cors: {
